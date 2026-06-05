@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Abogapy — Abogados verificados de Paraguay</title>
+<meta name="theme-color" content="#20283c">
+<meta name="application-name" content="Abogapy">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Abogapy">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#20283c; --ink-2:#2e3850; --muted:#6b7185; --line:rgba(32,40,60,.12);
+    --cream:#efe9dc; --paper:#fbf9f3; --paper-2:#f4f0e6;
+    --brass:#9a7634; --brass-2:#b8923f; --burgundy:#6e2a35; --green:#2f6b51; --green-bg:#e7f0ea;
+    --danger-bg:#f6e9ea; --warn-bg:#f7efe0; --shadow:0 1px 2px rgba(32,40,60,.06),0 8px 24px rgba(32,40,60,.06);
+    --r:9px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Archivo',-apple-system,system-ui,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 100% -10%, rgba(154,118,52,.07), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(46,56,80,.06), transparent 55%),
+      var(--cream);
+    color:var(--ink); line-height:1.5; -webkit-font-smoothing:antialiased; min-height:100vh;
+  }
+  h1,h2,h3,h4{font-family:'Fraunces',Georgia,serif; font-weight:600; line-height:1.15; margin:0; letter-spacing:-.01em}
+  a{color:var(--brass); cursor:pointer}
+  .serif{font-family:'Fraunces',Georgia,serif}
+  .app{display:none; min-height:100vh}
+  .app.active{display:block}
+  .topbar{display:flex; align-items:center; gap:14px; padding:14px 22px; border-bottom:1px solid var(--line);
+    background:rgba(251,249,243,.86); backdrop-filter:blur(8px); position:sticky; top:0; z-index:50}
+  .brand{font-family:'Fraunces',serif; font-weight:700; font-size:22px; letter-spacing:-.02em; display:flex; align-items:center; gap:10px}
+  .brand .dot{width:11px; height:11px; border-radius:50%; background:var(--brass-2); box-shadow:0 0 0 4px rgba(184,146,63,.18)}
+  .brand small{font-family:'Archivo'; font-weight:500; font-size:11px; color:var(--muted); letter-spacing:.14em; text-transform:uppercase}
+  .spacer{flex:1}
+  .usertag{font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:8px}
+  .usertag b{color:var(--ink)}
+  .shell{display:grid; grid-template-columns:236px 1fr; min-height:calc(100vh - 59px)}
+  .side{border-right:1px solid var(--line); padding:22px 16px; background:rgba(244,240,230,.5)}
+  .side .grp{font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin:18px 10px 8px}
+  .navitem{display:flex; align-items:center; gap:11px; padding:9px 12px; border-radius:8px; cursor:pointer; color:var(--ink-2); font-weight:500; font-size:14px; transition:.15s}
+  .navitem:hover{background:var(--paper)}
+  .navitem.active{background:var(--ink); color:#fff}
+  .navitem .ic{width:18px; text-align:center; opacity:.85}
+  .main{padding:30px 38px; max-width:1100px}
+  .page{display:none}.page.active{display:block}
+  .rise{animation:rise .4s ease both}
+  @keyframes rise{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+  .mobnav{display:none}
+  @media(max-width:880px){
+    .shell{grid-template-columns:1fr} .side{display:none}
+    .main{padding:22px 18px 96px}
+    .mobnav{display:flex; position:fixed; bottom:0; left:0; right:0; z-index:60; background:rgba(251,249,243,.97);
+      border-top:1px solid var(--line); padding:8px 6px calc(8px + env(safe-area-inset-bottom)); justify-content:space-around; backdrop-filter:blur(10px)}
+    .mobnav button{border:none; background:none; font-family:inherit; display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10px; color:var(--muted); cursor:pointer; flex:1; padding:4px}
+    .mobnav button .mi{font-size:19px}
+    .mobnav button.on{color:var(--ink); font-weight:700}
+    .g2,.g3{grid-template-columns:1fr !important}
+    .hero{padding-top:40px !important}
+  }
+  .h-head{margin-bottom:22px}
+  .h-head .eyebrow{font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--brass); font-weight:700; margin-bottom:8px}
+  .h-head h2{font-size:30px}
+  .h-head p{color:var(--muted); margin:8px 0 0; max-width:640px}
+  .card{background:var(--paper); border:1px solid var(--line); border-radius:var(--r); padding:22px; box-shadow:var(--shadow)}
+  .grid{display:grid; gap:18px}
+  .g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)}
+  label.f{display:block; margin-bottom:14px}
+  label.f .lab{display:block; font-size:14px; font-weight:600; margin-bottom:6px; color:var(--ink-2)}
+  label.f .hint{display:block; font-weight:400; color:var(--muted); font-size:12.5px; margin-top:2px}
+  input[type=text],input[type=email],input[type=tel],input[type=number],input[type=url],select,textarea{
+    width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:8px; font-family:inherit; font-size:15px;
+    background:var(--paper-2); color:var(--ink); transition:.15s}
+  input:focus,select:focus,textarea:focus{outline:none; border-color:var(--brass-2); background:#fff; box-shadow:0 0 0 3px rgba(184,146,63,.14)}
+  textarea{min-height:84px; resize:vertical}
+  input[type=file]{font-size:13px}
+  .btn{appearance:none; border:1px solid var(--ink); background:var(--ink); color:#fff; padding:12px 18px; border-radius:8px;
+    font-family:inherit; font-weight:600; font-size:15px; cursor:pointer; transition:.15s; display:inline-flex; align-items:center; justify-content:center; gap:8px}
+  .btn:hover{background:var(--ink-2)}
+  .btn.ghost{background:transparent; color:var(--ink)} .btn.ghost:hover{background:var(--paper-2)}
+  .btn.brass{background:var(--brass-2); border-color:var(--brass-2)} .btn.brass:hover{background:var(--brass)}
+  .btn.sm{padding:8px 13px; font-size:13px}
+  .btn.green{background:var(--green); border-color:var(--green)}
+  .btn.dgr{background:transparent; color:var(--burgundy); border-color:var(--burgundy)} .btn.dgr:hover{background:var(--danger-bg)}
+  .btn.block{width:100%}
+  .btn:disabled{opacity:.5; cursor:not-allowed}
+  .btn.oauth{background:#fff; color:var(--ink); border:1px solid var(--line); font-weight:600}
+  .btn.oauth:hover{background:var(--paper-2)}
+  .pill{display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:600; padding:4px 10px; border-radius:999px; background:var(--paper-2); border:1px solid var(--line); color:var(--ink-2)}
+  .pill.ok{background:var(--green-bg); color:var(--green); border-color:transparent}
+  .pill.warn{background:var(--warn-bg); color:var(--brass); border-color:transparent}
+  .pill.pend{background:#eef0f4; color:var(--muted); border-color:transparent}
+  .consent{display:flex; gap:11px; align-items:flex-start; padding:15px 16px; border:1px solid var(--line); border-radius:8px; margin-bottom:10px; background:var(--paper-2); border-left:3px solid var(--brass-2)}
+  .consent input{margin-top:3px; width:18px; height:18px; accent-color:var(--ink); flex-shrink:0}
+  .consent .ct{font-size:14px; color:var(--ink-2)} .consent .ct b{color:var(--ink)}
+  .callout{border-radius:8px; padding:14px 16px; font-size:13.5px; display:flex; gap:11px; align-items:flex-start; margin:6px 0 16px}
+  .callout.warn{background:var(--warn-bg)} .callout.danger{background:var(--danger-bg)} .callout.info{background:#eaf0f3}
+  .callout .ci{font-size:16px; line-height:1.2}
+  .stat{display:flex; flex-direction:column; gap:4px}
+  .stat .num{font-family:'Fraunces',serif; font-size:34px; font-weight:600}
+  .stat .lbl{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em}
+  table{width:100%; border-collapse:collapse; font-size:13.5px}
+  th{text-align:left; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:10px 12px; border-bottom:1px solid var(--line)}
+  td{padding:11px 12px; border-bottom:1px solid var(--line); vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  .lawcard{display:flex; gap:16px; padding:18px; border:1px solid var(--line); border-radius:var(--r); background:var(--paper); transition:.15s}
+  .lawcard:hover{box-shadow:var(--shadow); transform:translateY(-2px)}
+  .avatar{width:52px; height:52px; border-radius:12px; background:linear-gradient(135deg,var(--ink),var(--ink-2)); color:var(--brass-2);
+    display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-size:20px; font-weight:600; flex-shrink:0}
+  .tag{font-size:11px; padding:3px 8px; border-radius:6px; background:var(--paper-2); border:1px solid var(--line); color:var(--ink-2)}
+  .muted{color:var(--muted)} .small{font-size:12.5px}
+  .divider{height:1px; background:var(--line); margin:20px 0}
+  .footer-note{margin-top:34px; padding-top:18px; border-top:1px solid var(--line); font-size:11.5px; color:var(--muted)}
+  #landing{display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:0}
+  .hero{width:100%; max-width:980px; padding:64px 26px 28px; text-align:center}
+  .hero .kicker{font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:var(--brass); font-weight:700; margin-bottom:18px}
+  .hero h1{font-size:clamp(36px,6vw,60px); line-height:1.03}
+  .hero h1 em{font-style:italic; color:var(--brass-2)}
+  .hero p{font-size:17px; color:var(--ink-2); max-width:620px; margin:20px auto 0}
+  .rolepick{display:grid; grid-template-columns:repeat(2,1fr); gap:16px; width:100%; max-width:760px; padding:14px 26px 30px}
+  @media(max-width:680px){.rolepick{grid-template-columns:1fr}}
+  .roletile{cursor:pointer; text-align:left; padding:26px; border:1px solid var(--line); border-radius:14px; background:var(--paper); transition:.18s}
+  .roletile:hover{transform:translateY(-4px); box-shadow:var(--shadow); border-color:var(--brass-2)}
+  .roletile .ri{font-size:28px; margin-bottom:14px}
+  .roletile h3{font-size:22px; margin-bottom:8px}
+  .roletile p{font-size:14px; color:var(--muted); margin:0}
+  .secbar{width:100%; background:var(--ink); color:#efe9dc; padding:30px 26px; text-align:center}
+  .secbar .inner{max-width:860px; margin:0 auto}
+  .secbar h4{color:#fff; font-size:19px; margin-bottom:10px}
+  .secbar p{font-size:14px; color:#c7cbd6; margin:0}
+  .trustrow{display:flex; gap:22px; justify-content:center; flex-wrap:wrap; margin-top:18px}
+  .trustrow span{font-size:12.5px; color:#aeb4c2; display:flex; align-items:center; gap:7px}
+  .testbar{width:100%; max-width:760px; padding:0 26px 50px}
+  .testbox{border:1px dashed var(--line); border-radius:12px; padding:16px 18px; background:var(--paper-2)}
+  .testbox .tt{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); font-weight:700; margin-bottom:10px}
+  .testbtns{display:flex; gap:10px; flex-wrap:wrap}
+  .ov{position:fixed; inset:0; background:rgba(20,24,36,.55); backdrop-filter:blur(3px); display:none; align-items:center; justify-content:center; z-index:200; padding:24px}
+  .ov.on{display:flex}
+  .modal{background:var(--paper); border-radius:14px; max-width:680px; width:100%; max-height:88vh; overflow:auto; box-shadow:0 30px 80px rgba(0,0,0,.35)}
+  .modal .mh{padding:20px 26px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; position:sticky; top:0; background:var(--paper); z-index:2}
+  .modal .mb{padding:24px 26px}
+  .modal .mf{padding:16px 26px; border-top:1px solid var(--line); display:flex; gap:10px; justify-content:flex-end; position:sticky; bottom:0; background:var(--paper)}
+  .x{margin-left:auto; cursor:pointer; color:var(--muted); font-size:20px; border:none; background:none}
+  .legal h4{font-size:15px; margin:18px 0 6px} .legal p{font-size:13px; color:var(--ink-2); margin:0 0 10px}
+  .legal ol{font-size:13px; color:var(--ink-2); padding-left:20px} .legal li{margin-bottom:7px}
+  .toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:13px 20px; border-radius:10px; font-size:14px; font-weight:500; opacity:0; transition:.25s; z-index:300; box-shadow:var(--shadow)}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+  .empty{text-align:center; padding:40px; color:var(--muted)}
+  .chips{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{cursor:pointer; user-select:none; font-size:13px; padding:8px 13px; border-radius:999px; border:1px solid var(--line); background:var(--paper-2); transition:.12s}
+  .chip.on{background:var(--ink); color:#fff; border-color:var(--ink)}
+  .docpre{background:var(--ink); color:#d9dde6; padding:14px; border-radius:8px; font-family:ui-monospace,monospace; font-size:12px; white-space:pre-wrap; max-height:240px; overflow:auto}
+  .docrow{display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--line)}
+  .docrow:last-child{border-bottom:none}
+  .docrow .di{width:34px; height:34px; border-radius:8px; background:var(--paper-2); display:flex; align-items:center; justify-content:center; flex-shrink:0}
+  .gauge{height:12px; background:var(--paper-2); border-radius:99px; overflow:hidden; position:relative; margin:10px 0}
+  .gauge > i{position:absolute; top:0; bottom:0; width:3px; background:var(--ink); border-radius:2px}
+  .gauge .fill{height:100%; background:linear-gradient(90deg,var(--green),var(--brass-2),var(--burgundy))}
+  .authwrap{max-width:430px; margin:0 auto; padding:50px 26px}
+  .authwrap .ah{text-align:center; margin-bottom:28px}
+  .authwrap .ah h2{font-size:28px} .authwrap .ah p{color:var(--muted); margin-top:8px}
+  .orline{display:flex; align-items:center; gap:12px; color:var(--muted); font-size:12px; margin:18px 0}
+  .orline::before,.orline::after{content:''; flex:1; height:1px; background:var(--line)}
+  .gi{width:18px;height:18px}
+</style>
+</head>
+<body>
+
+<!-- ========================= LANDING ========================= -->
+<div id="landing" class="app active">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>Abogapy <small>Paraguay</small></div>
+    <div class="spacer"></div>
+    <button class="btn ghost sm" onclick="openLegal()">Términos</button>
+  </div>
+
+  <div class="hero rise">
+    <div class="kicker">Abogados verificados · Asunción · Paraguay</div>
+    <h1>Tu abogado de confianza, <em>verificado de verdad</em>.</h1>
+    <p>Te ayudamos a encontrar un abogado habilitado, sin dar vueltas ni adivinar precios. Vos elegís con quién hablar y qué información compartir. Nosotros nos encargamos de que todo sea seguro.</p>
+  </div>
+
+  <div class="rolepick rise">
+    <div class="roletile" onclick="chooseRole('cliente')">
+      <div class="ri">🔎</div>
+      <h3>Necesito un abogado</h3>
+      <p>Buscá por tema, mandá tu consulta y elegí con quién reunirte. Simple y claro.</p>
+    </div>
+    <div class="roletile" onclick="chooseRole('abogado')">
+      <div class="ri">⚖️</div>
+      <h3>Soy abogado</h3>
+      <p>Sumá tu perfil verificado, recibí consultas y aceptá con quién querés trabajar.</p>
+    </div>
+  </div>
+
+  <div class="secbar">
+    <div class="inner">
+      <h4>Hicimos la tarea para que vos no tengas que preocuparte</h4>
+      <p>Verificamos cada matrícula contra los registros oficiales, ciframos tu información y trabajamos conforme a la Ley N° 7.593/2025 de Protección de Datos Personales. Tu información está protegida y <b>solo vos decidís con quién compartirla</b>.</p>
+      <div class="trustrow">
+        <span>🛡️ Matrículas verificadas</span>
+        <span>🔒 Datos cifrados</span>
+        <span>📜 Cumplimiento legal</span>
+        <span>🤝 Vos tenés el control</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="testbar">
+    <div class="testbox">
+      <div class="tt">Usuarios de prueba (demo)</div>
+      <p class="small muted" style="margin:0 0 12px">Ingresá con datos ficticios para recorrer cada perfil. Marcados como <b>test_user</b>.</p>
+      <div class="testbtns">
+        <button class="btn sm ghost" onclick="loginTest('pepe')">👤 pepe (cliente)</button>
+        <button class="btn sm ghost" onclick="loginTest('law')">⚖️ law (abogado)</button>
+        <button class="btn sm ghost" onclick="loginTest('admin')">🛡️ admin</button>
+      </div>
+    </div>
+    <div class="footer-note" style="text-align:center; border:none">
+      ¿Sos del equipo? <a onclick="showAdmPortal()">Portal interno de administración</a> · En producción vive en <b>adm.abogapy.com</b>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= AUTH ========================= -->
+<div id="auth" class="app">
+  <div class="topbar">
+    <div class="brand" onclick="goHome()" style="cursor:pointer"><span class="dot"></span>Abogapy <small>Paraguay</small></div>
+    <div class="spacer"></div>
+    <button class="btn ghost sm" onclick="goHome()">Volver</button>
+  </div>
+  <div class="authwrap rise" id="authBody"></div>
+</div>
+
+<!-- ========================= ADMIN PORTAL (hidden URL) ========================= -->
+<div id="admportal" class="app">
+  <div class="topbar"><div class="brand"><span class="dot"></span>Abogapy <small>· Admin</small></div><div class="spacer"></div><button class="btn ghost sm" onclick="goHome()">Salir</button></div>
+  <div class="authwrap rise" style="text-align:center">
+    <div style="font-size:40px; margin-bottom:14px">🛡️</div>
+    <h2 class="serif">Portal interno</h2>
+    <p class="muted" style="margin:8px 0 24px">Acceso restringido al equipo de Abogapy. En producción esta vista está separada bajo <b>adm.abogapy.com</b> con su propio login y MFA.</p>
+    <button class="btn block brass" onclick="loginTest('admin')">Ingresar como administrador (demo)</button>
+  </div>
+</div>
+
+<!-- ========================= APP SHELL ========================= -->
+<div id="app" class="app">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>Abogapy <small>Paraguay</small></div>
+    <div class="spacer"></div>
+    <div class="usertag" id="userTag"></div>
+    <button class="btn ghost sm" onclick="openLegal()">Términos</button>
+    <button class="btn ghost sm" onclick="logout()">Salir</button>
+  </div>
+  <div class="shell">
+    <div class="side" id="side"></div>
+    <div class="main" id="main"></div>
+  </div>
+  <div class="mobnav" id="mobnav"></div>
+</div>
+
+<!-- ========================= LEGAL MODAL ========================= -->
+<div class="ov" id="legalOv">
+  <div class="modal">
+    <div class="mh"><h3 class="serif">Términos, Bases y Política de Datos</h3><button class="x" onclick="closeLegal()">✕</button></div>
+    <div class="mb legal" id="legalBody"></div>
+    <div class="mf"><button class="btn ghost" onclick="closeLegal()">Cerrar</button></div>
+  </div>
+</div>
+
+<!-- ========================= GENERIC MODAL ========================= -->
+<div class="ov" id="modalOv">
+  <div class="modal">
+    <div class="mh"><h3 class="serif" id="modalTitle">—</h3><button class="x" onclick="closeModal()">✕</button></div>
+    <div class="mb" id="modalBody"></div>
+    <div class="mf" id="modalFoot"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   Abogapy — prototipo funcional (frontend) · auth + PWA + roles
+   Persistencia: window.storage con fallback en memoria.
+   ===================================================================== */
+
+/* ---------- PWA manifest (inyectado) ---------- */
+(function(){
+  const icon='data:image/svg+xml;base64,'+btoa('<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512"><rect width="512" height="512" rx="96" fill="#20283c"/><circle cx="180" cy="150" r="34" fill="#b8923f"/><text x="50%" y="60%" font-family="Georgia,serif" font-size="300" font-weight="700" fill="#efe9dc" text-anchor="middle" dominant-baseline="middle">A</text></svg>');
+  const m={name:'Abogapy — Abogados verificados',short_name:'Abogapy',description:'Encontrá un abogado verificado en Paraguay.',start_url:'.',scope:'.',display:'standalone',orientation:'portrait',background_color:'#efe9dc',theme_color:'#20283c',icons:[{src:icon,sizes:'512x512',type:'image/svg+xml',purpose:'any maskable'}]};
+  try{ const b=new Blob([JSON.stringify(m)],{type:'application/manifest+json'}); const l=document.createElement('link'); l.rel='manifest'; l.href=URL.createObjectURL(b); document.head.appendChild(l);
+    const t=document.createElement('link'); t.rel='apple-touch-icon'; t.href=icon; document.head.appendChild(t);
+  }catch(e){}
+})();
+
+/* ---------- Storage ---------- */
+const mem={};
+const store={
+  async get(k){ try{ if(window.storage){ const r=await window.storage.get(k); return r?JSON.parse(r.value):(mem[k]??null);} }catch(e){} return mem[k]??null; },
+  async set(k,v){ mem[k]=v; try{ if(window.storage){ await window.storage.set(k,JSON.stringify(v)); } }catch(e){} }
+};
+const uid=()=>Math.random().toString(36).slice(2,9);
+const now=()=>new Date().toISOString();
+const fmt=(iso)=>new Date(iso).toLocaleDateString('es-PY',{day:'2-digit',month:'short',year:'numeric'});
+
+/* ---------- Reference data ---------- */
+const AREAS=['Laboral','Penal','Civil','Familia','Comercial / Societario','Tributario','Notarial','Administrativo','Inmobiliario','Sucesiones','Emprendimientos','Patentes / propiedad intelectual','Difamación en redes sociales','Bullying / acoso'];
+const DEPTS=['Central','Asunción','Alto Paraná','Itapúa','Caaguazú','Cordillera','Otro'];
+const CURS=['₲ (guaraníes)','US$ (dólares)','R$ (reales)'];
+const USD={'₲ (guaraníes)':1/7300,'US$ (dólares)':1,'R$ (reales)':1/5.4}; // demo
+function toUSD(rate,cur){ return (+rate||0)*(USD[cur]||0); }
+const PRESETS=[
+  {id:'lab',t:'Problema en el trabajo (despido, sueldo)'},
+  {id:'div',t:'Divorcio o tema de familia'},
+  {id:'con',t:'Revisar o redactar un contrato'},
+  {id:'pen',t:'Defensa penal'},
+  {id:'emp',t:'Abrir o formalizar mi emprendimiento'},
+  {id:'pat',t:'Registrar una patente o marca'},
+  {id:'def',t:'Difamación / me atacaron en redes'},
+  {id:'bul',t:'Bullying o acoso'},
+  {id:'deu',t:'Me deben plata / quiero cobrar'},
+  {id:'suc',t:'Herencia o sucesión'},
+  {id:'inm',t:'Alquiler o tema con un inmueble'},
+];
+const DOCTYPES=[
+  {id:'ci_f',t:'Cédula de identidad (frente)',req:false},
+  {id:'ci_d',t:'Cédula de identidad (dorso)',req:false},
+  {id:'vidres',t:'Certificado de vida y residencia',req:false},
+  {id:'pas',t:'Pasaporte',req:false},
+  {id:'antpen',t:'Antecedentes penales',req:false},
+  {id:'antjud',t:'Antecedentes judiciales',req:false},
+  {id:'otro',t:'Otro documento',req:false},
+];
+
+/* ---------- Sentencias dataset (fuente para el buscador) ---------- */
+const SENTENCIAS=[
+  {num:'S.D. N° 412',anio:2024,materia:'Laboral',trib:'Tribunal de Apelación del Trabajo',circ:'Capital',res:'Ha lugar',resumen:'Indemnización por despido injustificado; se confirma sentencia de primera instancia.',tags:['despido','indemnización']},
+  {num:'A.I. N° 88',anio:2023,materia:'Civil',trib:'Tribunal de Apelación Civil y Comercial',circ:'Central',res:'No ha lugar',resumen:'Excepción de prescripción rechazada en cobro de guaraníes.',tags:['prescripción','cobro']},
+  {num:'S.D. N° 1201',anio:2025,materia:'Familia',trib:'Tribunal de Apelación de la Niñez',circ:'Capital',res:'Parcial',resumen:'Régimen de relacionamiento modificado; alimentos confirmados.',tags:['alimentos','relacionamiento']},
+  {num:'S.D. N° 305',anio:2022,materia:'Penal',trib:'Tribunal de Sentencia',circ:'Alto Paraná',res:'Ha lugar',resumen:'Condena por estafa; se valora prueba documental.',tags:['estafa','prueba']},
+  {num:'S.D. N° 77',anio:2025,materia:'Comercial / Societario',trib:'Tribunal de Apelación Civil y Comercial',circ:'Capital',res:'Ha lugar',resumen:'Disolución de sociedad por conflicto entre socios.',tags:['sociedad','disolución']},
+  {num:'A.I. N° 540',anio:2024,materia:'Tributario',trib:'Tribunal de Cuentas',circ:'Capital',res:'No ha lugar',resumen:'Demanda contra determinación tributaria rechazada.',tags:['impuesto','determinación']},
+  {num:'S.D. N° 919',anio:2023,materia:'Civil',trib:'Tribunal de Apelación Civil y Comercial',circ:'Itapúa',res:'Parcial',resumen:'Daños y perjuicios por incumplimiento contractual; monto reducido.',tags:['daños','contrato']},
+  {num:'S.D. N° 233',anio:2025,materia:'Difamación en redes sociales',trib:'Juzgado en lo Civil',circ:'Capital',res:'Ha lugar',resumen:'Responsabilidad civil por publicaciones difamatorias en redes; indemnización.',tags:['difamación','redes']},
+  {num:'S.D. N° 150',anio:2022,materia:'Laboral',trib:'Tribunal de Apelación del Trabajo',circ:'Central',res:'No ha lugar',resumen:'Reclamo de horas extra rechazado por falta de prueba.',tags:['horas extra','prueba']},
+  {num:'S.D. N° 661',anio:2024,materia:'Sucesiones',trib:'Juzgado en lo Civil',circ:'Cordillera',res:'Ha lugar',resumen:'Declaratoria de herederos; partición de bienes.',tags:['herederos','partición']},
+  {num:'A.I. N° 12',anio:2025,materia:'Penal',trib:'Tribunal de Apelación Penal',circ:'Capital',res:'Parcial',resumen:'Se modifica medida cautelar; se mantiene proceso.',tags:['medida cautelar']},
+  {num:'S.D. N° 488',anio:2023,materia:'Familia',trib:'Tribunal de Apelación de la Niñez',circ:'Central',res:'Ha lugar',resumen:'Aumento de prestación alimentaria conforme a necesidades del menor.',tags:['alimentos']},
+];
+
+/* ---------- Session ---------- */
+let SESSION=null; // {role, name, email, provider, isTest}
+let PHOTO_TMP=null; // foto de perfil en edición
+let MEPROF={cliente:null, abogado:null};
+let ONBOARDED={cliente:false, abogado:false};
+
+/* ---------- Seed ---------- */
+async function seed(){
+  let laws=await store.get('laws');
+  if(!laws){
+    laws=[
+      {id:uid(),nombre:'María Fernanda Cardozo',mat:'12.345',anio:2011,areas:['Laboral','Civil'],dept:'Central',verif:true,abroad:false,rate:160000,cur:'₲ (guaraníes)',linkedin:'',facebook:'',bio:'',email:'mf@example.py',tel:'',docs:[],created:now()},
+      {id:uid(),nombre:'Diego Ramón Villalba',mat:'9.812',anio:2007,areas:['Penal'],dept:'Asunción',verif:true,abroad:true,abroadDet:'Argentina',rate:28,cur:'US$ (dólares)',linkedin:'',facebook:'',bio:'',email:'d@example.py',tel:'',docs:[],created:now()},
+      {id:uid(),nombre:'Lucía Benítez Ayala',mat:'15.220',anio:2015,areas:['Familia','Sucesiones'],dept:'Central',verif:false,abroad:false,rate:120000,cur:'₲ (guaraníes)',linkedin:'',facebook:'',bio:'',email:'l@example.py',tel:'',docs:[],created:now()},
+      {id:uid(),nombre:'Roberto Cáceres Domínguez',mat:'8.041',anio:2004,areas:['Comercial / Societario','Tributario'],dept:'Central',verif:true,abroad:false,rate:45,cur:'US$ (dólares)',linkedin:'',facebook:'',bio:'',email:'r@example.py',tel:'',docs:[],created:now()},
+      {id:uid(),nombre:'Sofía Aguilera',mat:'18.770',anio:2018,areas:['Emprendimientos','Patentes / propiedad intelectual'],dept:'Capital',verif:true,abroad:false,rate:200,cur:'R$ (reales)',linkedin:'',facebook:'',bio:'',email:'s@example.py',tel:'',docs:[],created:now()},
+    ];
+    await store.set('laws',laws);
+  }
+  if(!(await store.get('clients'))) await store.set('clients',[]);
+  if(!(await store.get('cons'))) await store.set('cons',[]);
+  if(!(await store.get('consents'))) await store.set('consents',[]);
+}
+
+/* ---------- Navigation ---------- */
+function show(id){ document.querySelectorAll('.app').forEach(a=>a.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); }
+function goHome(){ if(location.hash) history.replaceState(null,'',location.pathname); show('landing'); }
+function chooseRole(role){ renderAuth(role); show('auth'); }
+
+/* ---------- Auth ---------- */
+function gIcon(){ return '<svg class="gi" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.3 9.14 5.38 12 5.38z"/></svg>'; }
+function fIcon(){ return '<svg class="gi" viewBox="0 0 24 24"><path fill="#1877F2" d="M24 12a12 12 0 1 0-13.88 11.85v-8.38H7.08V12h3.04V9.36c0-3 1.79-4.67 4.53-4.67 1.31 0 2.69.24 2.69.24v2.95h-1.52c-1.49 0-1.95.93-1.95 1.87V12h3.32l-.53 3.47h-2.79v8.38A12 12 0 0 0 24 12z"/></svg>'; }
+let PENDING_ROLE=null, PENDING_PROVIDER=null, PENDING_PREFILL=null;
+function renderAuth(role){
+  PENDING_ROLE=role;
+  const who=role==='abogado'?'abogado':'cliente';
+  document.getElementById('authBody').innerHTML=`
+    <div class="ah"><h2 class="serif">${role==='abogado'?'Sumate como abogado':'Creá tu cuenta'}</h2>
+      <p>Entrá rápido y seguro con tu cuenta de siempre.</p></div>
+    <button class="btn oauth block" style="margin-bottom:10px" onclick="oauth('google')">${gIcon()} Continuar con Google</button>
+    <button class="btn oauth block" onclick="oauth('facebook')">${fIcon()} Continuar con Facebook</button>
+    <div class="orline">o</div>
+    <p class="small muted" style="text-align:center; margin:0 0 12px">Si preferís no usar Google ni Facebook, podés registrarte completando tu perfil. <b>Tu cuenta se crea recién cuando terminás todo el registro.</b></p>
+    <button class="btn ghost block" onclick="startLocal()">Registrarme completando mi perfil</button>`;
+}
+function oauth(provider){
+  PENDING_PROVIDER=provider;
+  PENDING_PREFILL = provider==='google' ? {nombre:'Usuario Google', email:'usuario@gmail.com'} : {nombre:'Usuario Facebook', email:'usuario@facebook.com'};
+  beginOnboarding(PENDING_ROLE, provider, PENDING_PREFILL);
+}
+function startLocal(){ PENDING_PROVIDER='local'; PENDING_PREFILL=null; beginOnboarding(PENDING_ROLE,'local',null); }
+
+function beginOnboarding(role, provider, prefill){
+  SESSION={role, provider, name:prefill?prefill.nombre:'', email:prefill?prefill.email:'', isTest:false, committed:false};
+  MEPROF[role]=null; ONBOARDED[role]=false;
+  show('app'); CURPAGE='onb'; renderNav(); RENDER.onb(prefill);
+}
+
+/* ---------- Test users ---------- */
+async function loginTest(which){
+  await seed();
+  if(which==='admin'){ SESSION={role:'admin', provider:'test', name:'Admin Demo', isTest:true, committed:true, desc:'test_user'}; show('app'); routeRole(); return; }
+  if(which==='law'){
+    const prof={id:uid(),nombre:'Dr. Law Test',mat:'99.999',anio:2016,areas:['Civil','Comercial / Societario'],dept:'Central',verif:true,abroad:true,abroadDet:'Brasil (test_user)',rate:35,cur:'US$ (dólares)',linkedin:'https://linkedin.com/in/lawtest',facebook:'',bio:'Perfil de prueba. test_user.',email:'law@test.py',tel:'0981 111111',docs:[{type:'ci_f',name:'cedula_frente.jpg',ts:now()},{type:'antpen',name:'antecedentes.pdf',ts:now()}],desc:'test_user',created:now()};
+    const laws=await store.get('laws')||[]; if(!laws.find(l=>l.mat==='99.999')){ laws.push(prof); await store.set('laws',laws); }
+    SESSION={role:'abogado',provider:'test',name:prof.nombre,isTest:true,committed:true,desc:'test_user'}; MEPROF.abogado=laws.find(l=>l.mat==='99.999')||prof; ONBOARDED.abogado=true; show('app'); routeRole(); return;
+  }
+  if(which==='pepe'){
+    const prof={id:uid(),nombre:'Pepe Test',tipo:'Persona física',doc:'1.111.111',email:'pepe@test.py',tel:'0981 222222',dept:'Central',area:'Laboral',desc:'test_user',docs:[{type:'ci_f',name:'pepe_cedula.jpg',ts:now()}],created:now()};
+    const clients=await store.get('clients')||[]; if(!clients.find(c=>c.doc==='1.111.111')){ clients.push(prof); await store.set('clients',clients); }
+    SESSION={role:'cliente',provider:'test',name:prof.nombre,isTest:true,committed:true,desc:'test_user'}; MEPROF.cliente=clients.find(c=>c.doc==='1.111.111')||prof; ONBOARDED.cliente=true; show('app'); routeRole(); return;
+  }
+}
+function showAdmPortal(){ history.replaceState(null,'','#adm'); show('admportal'); }
+function logout(){ SESSION=null; goHome(); }
+
+const ROLE=()=>SESSION?SESSION.role:'cliente';
+function routeRole(){
+  const r=ROLE();
+  if((r==='cliente'||r==='abogado') && !ONBOARDED[r]){ renderNav(); CURPAGE='onb'; RENDER.onb(); updateUserTag(); return; }
+  renderNav(); openPage(r==='admin'?'a_dash':r==='abogado'?'l_dash':'c_dir'); updateUserTag();
+}
+function updateUserTag(){
+  const t=document.getElementById('userTag'); if(!SESSION){ t.innerHTML=''; return; }
+  const prov = SESSION.provider==='google'?'Google':SESSION.provider==='facebook'?'Facebook':SESSION.provider==='test'?'demo':'cuenta';
+  t.innerHTML=`<b>${esc(SESSION.name||'Usuario')}</b> · ${({cliente:'Cliente',abogado:'Abogado',admin:'Admin'})[SESSION.role]} <span class="pill ${SESSION.isTest?'warn':'pend'}">${SESSION.isTest?'test_user':prov}</span>`;
+}
+
+const NAV={
+  cliente:[['c_dir','🔎','Buscar'],['c_req','📨','Mis consultas'],['onb','📝','Mi perfil']],
+  abogado:[['l_dash','📊','Resumen'],['l_req','📨','Consultas'],['l_clients','👥','Clientes'],['onb','📝','Mi perfil']],
+  admin:[['a_dash','📊','Panel'],['a_verif','🛡️','Verificación'],['a_sent','📄','Sentencias'],['a_data','🧮','Datos']]
+};
+let CURPAGE='';
+function renderNav(){
+  const r=ROLE();
+  const s=document.getElementById('side'); let h='<div class="grp">'+({cliente:'Cliente',abogado:'Abogado',admin:'Administración'})[r]+'</div>';
+  NAV[r].forEach(([id,ic,lab])=>h+=`<div class="navitem ${id===CURPAGE?'active':''}" onclick="openPage('${id}')"><span class="ic">${ic}</span>${lab}</div>`);
+  h+='<div class="grp">Legal</div><div class="navitem" onclick="openLegal()"><span class="ic">📜</span>Términos y Bases</div>';
+  s.innerHTML=h;
+  const m=document.getElementById('mobnav');
+  m.innerHTML=NAV[r].map(([id,ic,lab])=>`<button class="${id===CURPAGE?'on':''}" onclick="openPage('${id}')"><span class="mi">${ic}</span>${lab}</button>`).join('');
+}
+function openPage(id){ CURPAGE=id; renderNav();
+  const main=document.getElementById('main'); main.classList.remove('rise'); void main.offsetWidth; main.classList.add('rise');
+  RENDER[id]?RENDER[id]():(main.innerHTML='<div class="empty">Próximamente</div>'); }
+
+/* ---------- Helpers ---------- */
+function head(eyebrow,title,sub){ return `<div class="h-head"><div class="eyebrow">${eyebrow}</div><h2>${title}</h2>${sub?`<p>${sub}</p>`:''}</div>`; }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function initials(n){ return (n||'?').split(' ').slice(0,2).map(x=>x[0]).join('').toUpperCase(); }
+function avatarHtml(p,size){ const s=size||52; return (p&&p.photo)?('<img src="'+p.photo+'" alt="" style="width:'+s+'px;height:'+s+'px;border-radius:12px;object-fit:cover;flex-shrink:0">'):('<div class="avatar" style="width:'+s+'px;height:'+s+'px">'+initials(p&&p.nombre)+'</div>'); }
+function readPhoto(file,cb){ const r=new FileReader(); r.onload=function(){ const img=new Image(); img.onload=function(){ const m=256; let w=img.width,h=img.height; if(w>h){ if(w>m){ h=Math.round(h*m/w); w=m; } } else { if(h>m){ w=Math.round(w*m/h); h=m; } } const cv=document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(img,0,0,w,h); cb(cv.toDataURL('image/jpeg',0.82)); }; img.src=r.result; }; r.readAsDataURL(file); }
+function pickPhoto(f){ if(!f)return; readPhoto(f,function(d){ PHOTO_TMP=d; const el=document.getElementById('lPhotoPrev'); if(el) el.innerHTML='<img src="'+d+'" alt="" style="width:72px;height:72px;border-radius:12px;object-fit:cover">'; toast('Foto lista'); }); }
+function modal(title,body,footer){ document.getElementById('modalTitle').textContent=title; document.getElementById('modalBody').innerHTML=body; document.getElementById('modalFoot').innerHTML=footer||'<button class="btn ghost" onclick="closeModal()">Cerrar</button>'; document.getElementById('modalOv').classList.add('on'); }
+function closeModal(){ document.getElementById('modalOv').classList.remove('on'); }
+function docName(id){ const d=DOCTYPES.find(x=>x.id===id); return d?d.t:id; }
+
+/* ---------- Document uploader (reusable) ---------- */
+function docUploaderHtml(){
+  return `<div class="grid g2">${DOCTYPES.map(d=>`<label class="f"><span class="lab">${d.t}</span><input type="file" data-doc="${d.id}" accept="image/*,application/pdf"></label>`).join('')}</div>`;
+}
+function collectDocs(scopeEl){
+  const docs=[]; scopeEl.querySelectorAll('input[type=file][data-doc]').forEach(inp=>{ const f=inp.files[0]; if(f) docs.push({type:inp.dataset.doc, name:f.name, ts:now()}); }); return docs;
+}
+function docsListHtml(docs, onRenew){
+  if(!docs||!docs.length) return '<div class="empty" style="padding:24px">Todavía no subiste documentos.</div>';
+  return docs.map(function(d,i){
+    var call = onRenew + '(' + i + ')';
+    return '<div class="docrow"><div class="di">📎</div><div style="flex:1"><b class="small">' + esc(docName(d.type)) + '</b><div class="small muted">' + esc(d.name) + ' · ' + fmt(d.ts) + '</div></div>'
+      + '<button class="btn sm ghost" onclick="viewDoc(\'' + esc(d.name) + '\',\'' + esc(docName(d.type)) + '\')">Ver</button>'
+      + '<button class="btn sm" onclick="' + call + '">Renovar</button></div>';
+  }).join('');
+}
+function viewDoc(name,type){ modal(type, `<div class="callout info"><span class="ci">🔒</span><div class="small">En este demo guardamos solo el nombre y la fecha del archivo. En producción el documento se almacena cifrado y se muestra acá con acceso restringido.</div></div><div class="docpre">archivo: ${esc(name)}\ntipo: ${esc(type)}\nestado: cifrado (demo)</div>`); }
+
+/* =====================================================================
+   ONBOARDING
+   ===================================================================== */
+const RENDER={};
+RENDER.onb=function(prefill){
+  const r=ROLE();
+  if(r==='cliente') return onbCliente(prefill);
+  if(r==='abogado') return onbAbogado(prefill);
+  document.getElementById('main').innerHTML=head('Perfil','Administración','Sin onboarding.');
+};
+
+function onbCliente(prefill){
+  const me=MEPROF.cliente; const main=document.getElementById('main');
+  const nameV = me?me.nombre : (prefill?prefill.nombre:(SESSION&&SESSION.name)||'');
+  const mailV = me?me.email : (prefill?prefill.email:(SESSION&&SESSION.email)||'');
+  main.innerHTML = head('Tu cuenta', me?'Mi perfil':'Contanos un poco de vos',
+    'Te pedimos pocos datos: los justos para conectarte con un abogado. Todo queda protegido y vos decidís qué compartir.')
+  + `<div class="card">
+      <div class="grid g2">
+        <label class="f"><span class="lab">¿Cómo te llamás?<span class="hint">Tu nombre y apellido</span></span><input id="cNom" type="text" placeholder="Ej. Juan Pérez" value="${esc(nameV)}"></label>
+        <label class="f"><span class="lab">¿Sos una persona o una empresa?</span><select id="cTipo"><option>Persona</option><option>Empresa</option></select></label>
+        <label class="f"><span class="lab">Tu número de cédula<span class="hint">O RUC si es una empresa</span></span><input id="cDoc" type="text" placeholder="0.000.000" value="${esc(me?me.doc:'')}"></label>
+        <label class="f"><span class="lab">Tu correo<span class="hint">Te avisamos por acá cuando un abogado responda</span></span><input id="cMail" type="email" placeholder="vos@correo.com" value="${esc(mailV)}"></label>
+        <label class="f"><span class="lab">Tu celular</span><input id="cTel" type="tel" placeholder="0981 ..." value="${esc(me?me.tel:'')}"></label>
+        <label class="f"><span class="lab">¿Dónde vivís?</span><select id="cDept">${DEPTS.map(d=>`<option ${me&&me.dept===d?'selected':''}>${d}</option>`).join('')}</select></label>
+      </div>
+      <label class="f"><span class="lab">¿Con qué necesitás ayuda?<span class="hint">Elegí lo que más se parezca a tu situación</span></span>
+        <select id="cArea">${AREAS.map(a=>`<option ${me&&me.area===a?'selected':''}>${a}</option>`).join('')}</select></label>
+      <label class="f"><span class="lab">Contanos qué te pasa<span class="hint">En tus palabras, tranquilo. Esto es opcional</span></span>
+        <textarea id="cDesc" placeholder="Ej. Me despidieron y no me pagaron lo que me deben...">${esc(me?me.desc:'')}</textarea></label>
+
+      <div class="divider"></div>
+      <h4 class="serif" style="font-size:16px; margin-bottom:6px">Tus documentos</h4>
+      <p class="small muted" style="margin:0 0 14px">Podés subirlos ahora o más tarde desde tu perfil. Sirven para agilizar trámites con el abogado. Todo se guarda cifrado.</p>
+      <div id="cDocs">${docUploaderHtml()}</div>
+
+      <div class="divider"></div>
+      <label class="consent"><input type="checkbox" id="cAccept"><span class="ct">Leí y acepto los <a onclick="openLegal()">Términos y la Política de Datos</a>, y <b>entiendo los riesgos de grabar conversaciones</b> con un abogado.</span></label>
+      <button class="btn brass block" onclick="saveCliente()">${me?'Guardar cambios':'Crear mi cuenta'}</button>
+    </div>
+    ${me?`<div class="card" style="margin-top:18px"><h4 class="serif" style="font-size:16px; margin-bottom:6px">Mis documentos cargados</h4><p class="small muted" style="margin:0 0 8px">Podés revisarlos y renovarlos cuando quieras.</p><div id="cDocsList">${docsListHtml(me.docs,'renewClienteDoc')}</div></div>`:''}`;
+}
+async function saveCliente(){
+  if(!document.getElementById('cAccept').checked){ toast('Para continuar, aceptá los Términos'); return; }
+  const nom=document.getElementById('cNom').value.trim(), mail=document.getElementById('cMail').value.trim();
+  if(!nom||!mail){ toast('Completá tu nombre y correo'); return; }
+  const editing=MEPROF.cliente;
+  const docsNew=collectDocs(document.getElementById('cDocs'));
+  const prof={ id:editing?editing.id:uid(), nombre:nom, tipo:document.getElementById('cTipo').value, doc:document.getElementById('cDoc').value.trim(),
+    email:mail, tel:document.getElementById('cTel').value.trim(), dept:document.getElementById('cDept').value, area:document.getElementById('cArea').value,
+    desc:document.getElementById('cDesc').value.trim(), docs:(editing?editing.docs:[]).concat(docsNew), created:editing?editing.created:now() };
+  const clients=await store.get('clients')||[];
+  const i=clients.findIndex(c=>c.id===prof.id); if(i>=0) clients[i]=prof; else clients.push(prof);
+  await store.set('clients',clients);
+  MEPROF.cliente=prof; ONBOARDED.cliente=true; if(SESSION){ SESSION.name=nom; SESSION.committed=true; }
+  await logConsent('cliente',prof.id);
+  updateUserTag(); toast(editing?'Cambios guardados':'¡Listo! Tu cuenta fue creada'); openPage(editing?'onb':'c_dir');
+}
+async function renewClienteDoc(i){ const me=MEPROF.cliente; const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*,application/pdf';
+  inp.onchange=async()=>{ const f=inp.files[0]; if(!f)return; me.docs[i]={...me.docs[i],name:f.name,ts:now()}; const clients=await store.get('clients')||[]; const j=clients.findIndex(c=>c.id===me.id); if(j>=0)clients[j]=me; await store.set('clients',clients); toast('Documento renovado'); openPage('onb'); }; inp.click(); }
+
+function onbAbogado(prefill){
+  const me=MEPROF.abogado; const main=document.getElementById('main');
+  PHOTO_TMP = me&&me.photo?me.photo:null;
+  const nameV = me?me.nombre : (prefill?prefill.nombre:(SESSION&&SESSION.name)||'');
+  main.innerHTML = head('Tu perfil profesional', me?'Mi perfil y matrícula':'Sumate a Abogapy',
+    'Solo el nombre y la matrícula son obligatorios. El resto lo podés completar después — cuanto más completes, mejor te van a encontrar.')
+  + `<div class="callout info"><span class="ci">🛡️</span><div class="small">Verificamos tu matrícula contra el registro oficial de la Corte Suprema de Justicia. Mientras tanto figurás como <b>“Pendiente de verificación”</b>.</div></div>
+    <div class="card">
+      <div style="display:flex; align-items:center; gap:16px; margin-bottom:20px">
+        <div id="lPhotoPrev">${avatarHtml(me,72)}</div>
+        <div><button type="button" class="btn ghost sm" onclick="document.getElementById('lPhotoInput').click()">${me&&me.photo?'Cambiar foto':'Subir foto de perfil'}</button>
+        <input id="lPhotoInput" type="file" accept="image/*" style="display:none" onchange="pickPhoto(this.files[0])">
+        <div class="small muted" style="margin-top:6px">Se recorta y achica sola. Opcional, la podés cambiar después.</div></div>
+      </div>
+      <div class="grid g2">
+        <label class="f"><span class="lab">Nombre y apellido <span class="hint">Obligatorio</span></span><input id="lNom" type="text" placeholder="Ej. María Cardozo" value="${esc(nameV)}"></label>
+        <label class="f"><span class="lab">N° de Matrícula (CSJ) <span class="hint">Obligatorio</span></span><input id="lMat" type="text" placeholder="12.345" value="${esc(me?me.mat:'')}"></label>
+        <label class="f"><span class="lab">Año en que te matriculaste <span class="hint">Opcional</span></span><input id="lAnio" type="number" placeholder="2015" value="${me&&me.anio?me.anio:''}"></label>
+        <label class="f"><span class="lab">¿Dónde trabajás?<span class="hint">Opcional</span></span><select id="lDept">${DEPTS.map(d=>`<option ${me&&me.dept===d?'selected':''}>${d}</option>`).join('')}</select></label>
+        <label class="f"><span class="lab">Correo <span class="hint">Opcional</span></span><input id="lMail" type="email" placeholder="vos@correo.com" value="${esc(me?me.email:'')}"></label>
+        <label class="f"><span class="lab">Celular <span class="hint">Opcional</span></span><input id="lTel" type="tel" placeholder="0981 ..." value="${esc(me?me.tel:'')}"></label>
+      </div>
+      <div class="grid g2">
+        <label class="f"><span class="lab">Tu honorario por hora <span class="hint">Opcional · lo usamos para mostrarte cómo estás vs. otros</span></span><input id="lRate" type="number" placeholder="Ej. 250000" value="${me&&me.rate?me.rate:''}"></label>
+        <label class="f"><span class="lab">Moneda</span><select id="lCur">${CURS.map(c=>`<option ${me&&me.cur===c?'selected':''}>${c}</option>`).join('')}</select></label>
+      </div>
+      <label class="f"><span class="lab">Áreas en las que trabajás <span class="hint">Opcional · elegí las que quieras</span></span>
+        <div class="chips" id="lAreas">${AREAS.map(a=>`<span class="chip ${me&&me.areas&&me.areas.includes(a)?'on':''}" data-a="${a}" onclick="this.classList.toggle('on')">${a}</span>`).join('')}</div></label>
+      <div class="grid g2">
+        <label class="f"><span class="lab">LinkedIn <span class="hint">Opcional</span></span><input id="lLinkedin" type="url" placeholder="https://linkedin.com/in/..." value="${esc(me?me.linkedin:'')}"></label>
+        <label class="f"><span class="lab">Facebook <span class="hint">Opcional</span></span><input id="lFacebook" type="url" placeholder="https://facebook.com/..." value="${esc(me?me.facebook:'')}"></label>
+      </div>
+      <div class="grid g2">
+        <label class="f"><span class="lab">¿Ejerciste en otros países? <span class="hint">Opcional</span></span>
+          <select id="lAbroad" onchange="document.getElementById('lAbroadWrap').style.display=this.value==='Sí'?'block':'none'"><option ${me&&me.abroad?'':'selected'}>No</option><option ${me&&me.abroad?'selected':''}>Sí</option></select></label>
+        <div id="lAbroadWrap" style="display:${me&&me.abroad?'block':'none'}"><label class="f"><span class="lab">¿En cuáles?</span><input id="lAbroadDet" type="text" placeholder="Ej. Argentina — comercial" value="${esc(me?me.abroadDet:'')}"></label></div>
+      </div>
+      <label class="f"><span class="lab">Una breve presentación <span class="hint">Opcional</span></span><textarea id="lBio" placeholder="Tu experiencia, enfoque, idiomas...">${esc(me?me.bio:'')}</textarea></label>
+
+      <div class="divider"></div>
+      <h4 class="serif" style="font-size:16px; margin-bottom:6px">Tus documentos</h4>
+      <p class="small muted" style="margin:0 0 14px">Subí tu credencial y los que quieras. Opcional, y renovable después. Todo cifrado.</p>
+      <div id="lDocs">${docUploaderHtml()}</div>
+
+      <div class="divider"></div>
+      <label class="consent"><input type="checkbox" id="lAccept"><span class="ct"><b>Declaro que mi matrícula está vigente</b> y que no estoy inhabilitado, y acepto los <a onclick="openLegal()">Términos y la Política de Datos</a>.</span></label>
+      <button class="btn brass block" onclick="saveAbogado()">${me?'Guardar cambios':'Enviar y crear mi perfil'}</button>
+    </div>
+    ${me?`<div class="card" style="margin-top:18px"><h4 class="serif" style="font-size:16px; margin-bottom:6px">Mis documentos cargados</h4><div id="lDocsList">${docsListHtml(me.docs,'renewAbogadoDoc')}</div></div>`:''}`;
+}
+async function saveAbogado(){
+  if(!document.getElementById('lAccept').checked){ toast('Para continuar, aceptá la declaración y los Términos'); return; }
+  const nom=document.getElementById('lNom').value.trim(), mat=document.getElementById('lMat').value.trim();
+  if(!nom||!mat){ toast('Completá al menos tu nombre y matrícula'); return; }
+  const editing=MEPROF.abogado;
+  const areas=[...document.querySelectorAll('#lAreas .chip.on')].map(c=>c.dataset.a);
+  const abroad=document.getElementById('lAbroad').value==='Sí';
+  const docsNew=collectDocs(document.getElementById('lDocs'));
+  const prof={ id:editing?editing.id:uid(), nombre:nom, mat, anio:+document.getElementById('lAnio').value||null, areas,
+    dept:document.getElementById('lDept').value, email:document.getElementById('lMail').value.trim(), tel:document.getElementById('lTel').value.trim(),
+    rate:+document.getElementById('lRate').value||null, cur:document.getElementById('lCur').value,
+    linkedin:document.getElementById('lLinkedin').value.trim(), facebook:document.getElementById('lFacebook').value.trim(),
+    abroad, abroadDet:abroad?document.getElementById('lAbroadDet').value.trim():'', bio:document.getElementById('lBio').value.trim(),
+    verif:editing?editing.verif:false, photo:PHOTO_TMP||(editing&&editing.photo)||null, docs:(editing?editing.docs:[]).concat(docsNew), created:editing?editing.created:now() };
+  const laws=await store.get('laws')||[]; const i=laws.findIndex(l=>l.id===prof.id); if(i>=0) laws[i]=prof; else laws.push(prof);
+  await store.set('laws',laws);
+  MEPROF.abogado=prof; ONBOARDED.abogado=true; if(SESSION){ SESSION.name=nom; SESSION.committed=true; }
+  await logConsent('abogado',prof.id);
+  updateUserTag(); toast(editing?'Cambios guardados':'¡Perfil creado! Pendiente de verificación'); openPage(editing?'onb':'l_dash');
+}
+async function renewAbogadoDoc(i){ const me=MEPROF.abogado; const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*,application/pdf';
+  inp.onchange=async()=>{ const f=inp.files[0]; if(!f)return; me.docs[i]={...me.docs[i],name:f.name,ts:now()}; const laws=await store.get('laws')||[]; const j=laws.findIndex(l=>l.id===me.id); if(j>=0)laws[j]=me; await store.set('laws',laws); toast('Documento renovado'); openPage('onb'); }; inp.click(); }
+
+async function logConsent(role,subjectId){ const log=await store.get('consents')||[]; log.push({id:uid(),role,subjectId,ts:now(),text:'Aceptación de Términos + Política de Datos + reconocimiento de riesgos de grabación'}); await store.set('consents',log); }
+
+/* =====================================================================
+   CLIENTE
+   ===================================================================== */
+let DIR_FILTER='Todas';
+RENDER.c_dir=async function(){
+  const main=document.getElementById('main'); const laws=await store.get('laws')||[];
+  const list=DIR_FILTER==='Todas'?laws:laws.filter(l=>l.areas&&l.areas.includes(DIR_FILTER));
+  main.innerHTML=head('Buscar','Abogados disponibles','Filtrá por tema. El check verde significa que verificamos su matrícula.')
+   + `<div style="margin-bottom:18px" class="chips"><span class="chip ${DIR_FILTER==='Todas'?'on':''}" onclick="DIR_FILTER='Todas';RENDER.c_dir()">Todas</span>${AREAS.map(a=>`<span class="chip ${DIR_FILTER===a?'on':''}" onclick="DIR_FILTER='${a.replace(/'/g,"\\'")}';RENDER.c_dir()">${a}</span>`).join('')}</div>
+      <div class="grid g2">${list.map(lawCardHtml).join('')||'<div class="empty">No hay abogados en este tema.</div>'}</div>`;
+};
+function lawCardHtml(l){
+  const links=[l.linkedin?`<a href="${esc(l.linkedin)}" target="_blank" class="small">LinkedIn</a>`:'',l.facebook?`<a href="${esc(l.facebook)}" target="_blank" class="small">Facebook</a>`:''].filter(Boolean).join(' · ');
+  return `<div class="lawcard">${avatarHtml(l,52)}
+    <div style="flex:1; min-width:0">
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap"><b style="font-size:15.5px">${esc(l.nombre)}</b>${l.verif?'<span class="pill ok">✓ Verificado</span>':'<span class="pill pend">Pendiente</span>'}</div>
+      <div class="small muted" style="margin:3px 0 8px">Mat. ${esc(l.mat)}${l.anio?(' · desde '+l.anio):''} · ${esc(l.dept||'')}</div>
+      <div class="chips" style="margin-bottom:10px">${(l.areas||[]).map(a=>`<span class="tag">${a}</span>`).join('')}</div>
+      ${links?`<div style="margin-bottom:8px">${links}</div>`:''}
+      <div style="display:flex; align-items:center; gap:10px"><span class="small muted">Honorario a convenir</span><span class="spacer" style="flex:1"></span><button class="btn sm" onclick='reqModal("${l.id}")'>Consultar</button></div>
+    </div></div>`;
+}
+async function reqModal(lawId){
+  const laws=await store.get('laws')||[]; const l=laws.find(x=>x.id===lawId);
+  modal('Consultar a '+l.nombre,
+    `<p class="small muted">Elegí lo que se parezca a tu caso o escribilo. El abogado decide si acepta reunirse.</p>
+     <label class="f"><span class="lab">Temas frecuentes</span><div class="chips">${PRESETS.map(p=>`<span class="chip" data-t="${esc(p.t)}" onclick="this.classList.toggle('on')">${p.t}</span>`).join('')}</div></label>
+     <label class="f"><span class="lab">¿Algo más? Contale tu caso</span><textarea id="reqCustom" placeholder="Escribí acá..."></textarea></label>
+     <label class="f"><span class="lab">Documentos para compartir <span class="hint">Opcional — quedan bloqueados hasta que el abogado acepte</span></span><input id="reqFile" type="file" multiple></label>`,
+    `<button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn brass" onclick='sendReq("${lawId}")'>Enviar consulta</button>`);
+}
+async function sendReq(lawId){
+  if(!MEPROF.cliente){ toast('Primero completá tu perfil'); closeModal(); openPage('onb'); return; }
+  const presets=[...document.querySelectorAll('#modalBody .chip.on')].map(c=>c.dataset.t);
+  const custom=document.getElementById('reqCustom').value.trim();
+  if(!presets.length&&!custom){ toast('Elegí o escribí tu consulta'); return; }
+  const files=[...document.getElementById('reqFile').files].map(f=>f.name);
+  const cons=await store.get('cons')||[];
+  cons.push({id:uid(),lawId,clientId:MEPROF.cliente.id,clientName:MEPROF.cliente.nombre,presets,custom,files,status:'pendiente',created:now(),meetLink:''});
+  await store.set('cons',cons); closeModal(); toast('Consulta enviada'); openPage('c_req');
+}
+RENDER.c_req=async function(){
+  const main=document.getElementById('main'); const cons=(await store.get('cons')||[]).filter(c=>MEPROF.cliente&&c.clientId===MEPROF.cliente.id); const laws=await store.get('laws')||[];
+  main.innerHTML=head('Mis consultas','Cómo van tus pedidos','Acá ves quién te aceptó y cómo seguir.')
+   + (cons.length?`<div class="card" style="padding:0"><table><thead><tr><th>Abogado</th><th>Tema</th><th>Estado</th><th>Reunión</th></tr></thead><tbody>${
+      cons.slice().reverse().map(c=>{ const l=laws.find(x=>x.id===c.lawId)||{nombre:'—'}; const txt=[...(c.presets||[]),c.custom].filter(Boolean).join(' · ');
+        const st=c.status==='aceptada'?'<span class="pill ok">Aceptada</span>':c.status==='rechazada'?'<span class="pill warn">Rechazada</span>':'<span class="pill pend">Pendiente</span>';
+        return `<tr><td><b>${esc(l.nombre)}</b></td><td class="small">${esc(txt).slice(0,70)}</td><td>${st}</td><td class="small">${c.meetLink?`<a href="${esc(c.meetLink)}" target="_blank">Unirse</a>`:'<span class="muted">—</span>'}</td></tr>`; }).join('')
+     }</tbody></table></div>`:'<div class="empty">Todavía no enviaste consultas. Andá a Buscar.</div>');
+};
+
+/* =====================================================================
+   ABOGADO
+   ===================================================================== */
+RENDER.l_dash=async function(){
+  const main=document.getElementById('main'); const me=MEPROF.abogado; if(!me){ openPage('onb'); return; }
+  const cons=(await store.get('cons')||[]).filter(c=>c.lawId===me.id);
+  const pend=cons.filter(c=>c.status==='pendiente').length, acc=cons.filter(c=>c.status==='aceptada').length;
+  const laws=await store.get('laws')||[];
+  main.innerHTML=head('Resumen','Hola, '+(me.nombre||'').split(' ')[0], me.verif?'Tu matrícula está verificada.':'Tu perfil está <b>pendiente de verificación</b>.')
+   + `<div class="grid g3" style="margin-bottom:18px">
+        <div class="card"><div class="stat"><span class="num">${cons.length}</span><span class="lbl">Consultas</span></div></div>
+        <div class="card"><div class="stat"><span class="num">${pend}</span><span class="lbl">Pendientes</span></div></div>
+        <div class="card"><div class="stat"><span class="num">${acc}</span><span class="lbl">Aceptadas</span></div></div>
+      </div>`
+   + feeBenchmark(me,laws);
+};
+function feeBenchmark(me,laws){
+  const rated=laws.filter(l=>l.rate&&l.cur).map(l=>toUSD(l.rate,l.cur)).filter(v=>v>0).sort((a,b)=>a-b);
+  if(!me.rate||!me.cur){ return `<div class="card"><h4 class="serif" style="font-size:17px; margin-bottom:8px">Comparación de honorarios</h4><p class="small muted" style="margin:0">Agregá tu <b>honorario por hora</b> en tu perfil y te mostramos cómo estás respecto a otros profesionales del mercado.</p><div style="margin-top:12px"><button class="btn sm" onclick="openPage('onb')">Completar honorario</button></div></div>`; }
+  const myUSD=toUSD(me.rate,me.cur);
+  const min=rated[0]||myUSD, max=rated[rated.length-1]||myUSD, avg=rated.reduce((a,b)=>a+b,0)/(rated.length||1);
+  const below=rated.filter(v=>v<myUSD).length, pct=rated.length?Math.round(below/rated.length*100):50;
+  const level=pct<33?'Económico':pct<67?'En el promedio del mercado':'Premium';
+  const pos=max>min?Math.max(2,Math.min(98,(myUSD-min)/(max-min)*100)):50;
+  const eq=(usd)=>`₲ ${Math.round(usd/USD['₲ (guaraníes)']).toLocaleString('es-PY')} · US$ ${usd.toFixed(0)} · R$ ${(usd/USD['R$ (reales)']).toFixed(0)}`;
+  return `<div class="card"><div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap"><h4 class="serif" style="font-size:17px">Comparación de honorarios</h4><span class="pill ${pct<33?'ok':pct<67?'pend':'warn'}">${level}</span></div>
+    <p class="small muted" style="margin:8px 0 4px">Tu tarifa equivale a <b>US$ ${myUSD.toFixed(1)}/h</b>. Estás por encima del <b>${pct}%</b> de los profesionales comparados.</p>
+    <div class="gauge"><div class="fill"></div><i style="left:${pos}%"></i></div>
+    <div class="small muted" style="display:flex; justify-content:space-between"><span>min · ${eq(min)}</span><span>prom · ${eq(avg)}</span><span>max · ${eq(max)}</span></div>
+    <p class="small muted" style="margin-top:10px">Conversión referencial (demo): ₲/US$/R$ por hora. En producción usaríamos cotizaciones actualizadas.</p></div>`;
+}
+RENDER.l_req=async function(){
+  const main=document.getElementById('main'); const me=MEPROF.abogado; if(!me){ openPage('onb'); return; }
+  const cons=(await store.get('cons')||[]).filter(c=>c.lawId===me.id);
+  main.innerHTML=head('Consultas','Aceptá o rechazá','Vos elegís con quién trabajar. Los documentos se ven solo si aceptás.')
+   + (cons.length?cons.slice().reverse().map(reqRowHtml).join(''):'<div class="empty">No tenés consultas todavía.</div>');
+};
+function reqRowHtml(c){
+  const txt=[...(c.presets||[]),c.custom].filter(Boolean).join(' · ');
+  const ctrl=c.status==='pendiente'
+    ? `<button class="btn sm green" onclick='decide("${c.id}","aceptada")'>Aceptar y agendar</button> <button class="btn sm dgr" onclick='decide("${c.id}","rechazada")'>Rechazar</button>`
+    : c.status==='aceptada'?`<span class="pill ok">Aceptada</span> ${c.meetLink?`<a class="small" href="${esc(c.meetLink)}" target="_blank">Enlace de reunión</a>`:''}`:'<span class="pill warn">Rechazada</span>';
+  return `<div class="card" style="margin-bottom:14px"><div style="display:flex; gap:14px; align-items:flex-start">
+    <div class="avatar" style="background:linear-gradient(135deg,var(--brass),var(--brass-2)); color:#fff">${initials(c.clientName)}</div>
+    <div style="flex:1"><b>${esc(c.clientName)}</b> <span class="small muted">· ${fmt(c.created)}</span>
+      <p class="small" style="margin:6px 0">${esc(txt)}</p>
+      ${c.files&&c.files.length?`<div class="small muted">📎 ${c.files.length} documento(s) ${c.status==='aceptada'?'(acceso habilitado)':'<span class="pill pend">bloqueados</span>'}</div>`:''}
+      <div style="margin-top:12px">${ctrl}</div></div></div></div>`;
+}
+async function decide(id,status){
+  const cons=await store.get('cons')||[]; const c=cons.find(x=>x.id===id); if(!c)return;
+  c.status=status; if(status==='aceptada') c.meetLink='https://meet.google.com/lookup/'+uid();
+  await store.set('cons',cons); toast(status==='aceptada'?'Aceptada · enlace generado':'Consulta rechazada'); openPage('l_req');
+}
+RENDER.l_clients=async function(){
+  const main=document.getElementById('main'); const me=MEPROF.abogado; if(!me){ openPage('onb'); return; }
+  const cons=(await store.get('cons')||[]).filter(c=>c.lawId===me.id&&c.status==='aceptada'); const clients=await store.get('clients')||[];
+  main.innerHTML=head('Clientes','Historial de clientes','Aparecen solo los clientes que aceptaste.')
+   + (cons.length?`<div class="card" style="padding:0"><table><thead><tr><th>Cliente</th><th>Tema</th><th>Desde</th></tr></thead><tbody>${
+      cons.map(c=>{ const cl=clients.find(x=>x.id===c.clientId); const m=[...(c.presets||[]),c.custom].filter(Boolean)[0]||'—';
+        return `<tr><td><b>${esc(c.clientName)}</b><div class="small muted">${cl?esc(cl.email):''}</div></td><td class="small">${esc(m)}</td><td class="small">${fmt(c.created)}</td></tr>`; }).join('')
+     }</tbody></table></div>`:'<div class="empty">Todavía no aceptaste consultas.</div>');
+};
+
+/* =====================================================================
+   ADMIN
+   ===================================================================== */
+RENDER.a_dash=async function(){
+  const main=document.getElementById('main'); const laws=await store.get('laws')||[],clients=await store.get('clients')||[],cons=await store.get('cons')||[];
+  const verif=laws.filter(l=>l.verif).length;
+  main.innerHTML=head('Panel','Administración de Abogapy','Estado general de la plataforma.')
+   + `<div class="grid g3" style="margin-bottom:18px">
+        <div class="card"><div class="stat"><span class="num">${laws.length}</span><span class="lbl">Abogados</span></div><div class="small muted" style="margin-top:6px">${verif} verificados · ${laws.length-verif} pendientes</div></div>
+        <div class="card"><div class="stat"><span class="num">${clients.length}</span><span class="lbl">Clientes</span></div></div>
+        <div class="card"><div class="stat"><span class="num">${cons.length}</span><span class="lbl">Consultas</span></div></div>
+      </div>
+      <div class="grid g2">
+        <div class="card"><b class="serif" style="font-size:16px">Registro de consentimientos</b><p class="small muted" style="margin:8px 0 0">Cada aceptación queda registrada con fecha y hora (Ley 7.593/2025). Total: <b>${(await store.get('consents')||[]).length}</b>.</p></div>
+        <div class="card"><b class="serif" style="font-size:16px">Buscador de sentencias</b><p class="small muted" style="margin:8px 0 0">Consultá jurisprudencia pública por parámetros desde <a onclick="openPage('a_sent')">Sentencias</a>.</p></div>
+      </div>`;
+};
+RENDER.a_verif=async function(){
+  const main=document.getElementById('main'); const laws=await store.get('laws')||[];
+  main.innerHTML=head('Verificación','Matrículas','Contrastá contra el dataset oficial de la CSJ y aprobá. Es referencial.')
+   + `<div class="callout info"><span class="ci">🔗</span><div class="small">Fuente: <b>datos.gov.py/dataset/abogados</b> (CSJ). En producción este botón consulta el dataset por N° de matrícula.</div></div>
+      <div class="card" style="padding:0"><table><thead><tr><th>Abogado</th><th>Matrícula</th><th>Áreas</th><th>Exterior</th><th>Estado</th><th></th></tr></thead><tbody>${
+      laws.map(l=>`<tr><td><b>${esc(l.nombre)}</b>${l.desc==='test_user'?' <span class="pill warn">test_user</span>':''}</td><td>${esc(l.mat)}</td><td class="small">${(l.areas||[]).join(', ')}</td><td class="small">${l.abroad?esc(l.abroadDet||'Sí'):'—'}</td>
+        <td>${l.verif?'<span class="pill ok">Verificada</span>':'<span class="pill pend">Pendiente</span>'}</td>
+        <td>${l.verif?`<button class="btn sm dgr" onclick='setVerif("${l.id}",false)'>Revocar</button>`:`<button class="btn sm green" onclick='setVerif("${l.id}",true)'>Verificar</button>`}</td></tr>`).join('')
+      }</tbody></table></div>`;
+};
+async function setVerif(id,val){ const laws=await store.get('laws')||[]; const l=laws.find(x=>x.id===id); if(l){ l.verif=val; await store.set('laws',laws); } if(MEPROF.abogado&&MEPROF.abogado.id===id)MEPROF.abogado.verif=val; toast(val?'Verificada':'Revocada'); RENDER.a_verif(); }
+
+/* ----- Buscador de sentencias (query con parámetros) ----- */
+let LASTQ=[];
+RENDER.a_sent=function(){
+  const main=document.getElementById('main');
+  main.innerHTML=head('Sentencias','Buscador de jurisprudencia','Consultá resoluciones públicas por parámetros. Definí los filtros y ejecutá la consulta.')
+  + `<div class="callout info"><span class="ci">📚</span><div class="small">Fuente: jurisprudencia pública de la Corte Suprema de Justicia (acceso libre). Solo resoluciones públicas — sin datos privados de clientes.</div></div>
+    <div class="card">
+      <div class="grid g3">
+        <label class="f"><span class="lab">Materia</span><select id="qMat"><option>Todas</option>${AREAS.map(a=>`<option>${a}</option>`).join('')}</select></label>
+        <label class="f"><span class="lab">Resultado</span><select id="qRes"><option>Todos</option><option>Ha lugar</option><option>No ha lugar</option><option>Parcial</option></select></label>
+        <label class="f"><span class="lab">Circunscripción</span><select id="qCirc"><option>Todas</option>${[...new Set(SENTENCIAS.map(s=>s.circ))].map(c=>`<option>${c}</option>`).join('')}</select></label>
+        <label class="f"><span class="lab">Año desde</span><input id="qDesde" type="number" placeholder="2022"></label>
+        <label class="f"><span class="lab">Año hasta</span><input id="qHasta" type="number" placeholder="2025"></label>
+        <label class="f"><span class="lab">Palabra clave</span><input id="qKw" type="text" placeholder="Ej. indemnización"></label>
+      </div>
+      <div style="display:flex; gap:10px"><button class="btn brass" onclick="runQuery()">Ejecutar consulta</button><button class="btn ghost" onclick="RENDER.a_sent()">Limpiar</button></div>
+    </div>
+    <div id="qResults" style="margin-top:18px"></div>`;
+};
+function runQuery(){
+  const mat=document.getElementById('qMat').value, res=document.getElementById('qRes').value, circ=document.getElementById('qCirc').value;
+  const desde=+document.getElementById('qDesde').value||0, hasta=+document.getElementById('qHasta').value||9999, kw=document.getElementById('qKw').value.trim().toLowerCase();
+  LASTQ=SENTENCIAS.filter(s=>(mat==='Todas'||s.materia===mat)&&(res==='Todos'||s.res===res)&&(circ==='Todas'||s.circ===circ)&&s.anio>=desde&&s.anio<=hasta&&(!kw||(s.resumen+' '+s.tags.join(' ')+' '+s.num).toLowerCase().includes(kw)));
+  const out=document.getElementById('qResults');
+  out.innerHTML=`<div class="card" style="padding:0"><div style="display:flex; align-items:center; padding:14px 18px; border-bottom:1px solid var(--line)"><b class="serif" style="font-size:16px">${LASTQ.length} resultado(s)</b><span class="spacer" style="flex:1"></span>${LASTQ.length?'<button class="btn sm ghost" onclick="exportQuery()">Exportar JSON</button>':''}</div>
+    ${LASTQ.length?`<table><thead><tr><th>Resolución</th><th>Materia</th><th>Año</th><th>Resultado</th><th></th></tr></thead><tbody>${
+      LASTQ.map((s,i)=>`<tr><td><b>${esc(s.num)}</b><div class="small muted">${esc(s.trib)}</div></td><td class="small">${esc(s.materia)}</td><td class="small">${s.anio}</td><td>${s.res==='Ha lugar'?'<span class="pill ok">Ha lugar</span>':s.res==='No ha lugar'?'<span class="pill warn">No ha lugar</span>':'<span class="pill pend">Parcial</span>'}</td><td><button class="btn sm ghost" onclick="viewSent(${i})">Ver</button></td></tr>`).join('')
+    }</tbody></table>`:'<div class="empty">Sin resultados para esos parámetros.</div>'}</div>`;
+}
+function viewSent(i){ const s=LASTQ[i]; if(!s)return; modal(s.num, `<div class="small muted" style="margin-bottom:10px">${esc(s.materia)} · ${esc(s.trib)} · ${esc(s.circ)} · ${s.anio}</div><div class="chips" style="margin-bottom:12px">${s.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div><div class="docpre">${esc(s.resumen)}</div>`); }
+function exportQuery(){ const blob=new Blob([JSON.stringify(LASTQ,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='abogapy_consulta_sentencias.json'; a.click(); toast('JSON exportado'); }
+
+RENDER.a_data=async function(){
+  const main=document.getElementById('main'); const laws=await store.get('laws')||[],cons=await store.get('cons')||[];
+  const byArea={}; laws.forEach(l=>(l.areas||[]).forEach(a=>byArea[a]=(byArea[a]||0)+1));
+  const max=Math.max(1,...Object.values(byArea));
+  main.innerHTML=head('Datos','Vista interna','Métricas agregadas y anonimizadas para operar y mejorar la plataforma.')
+  + `<div class="grid g2">
+      <div class="card"><b class="serif" style="font-size:16px">Abogados por área</b><div style="margin-top:14px">${
+        Object.entries(byArea).sort((a,b)=>b[1]-a[1]).map(([a,n])=>`<div style="margin-bottom:10px"><div class="small" style="display:flex; justify-content:space-between"><span>${a}</span><b>${n}</b></div><div class="gauge"><div class="fill" style="width:${n/max*100}%"></div></div></div>`).join('')||'<div class="muted small">Sin datos</div>'
+      }</div></div>
+      <div class="card"><b class="serif" style="font-size:16px">Actividad</b><div class="grid g2" style="margin-top:14px">
+        <div class="stat"><span class="num">${cons.length}</span><span class="lbl">Consultas</span></div>
+        <div class="stat"><span class="num">${SENTENCIAS.length}</span><span class="lbl">Sentencias indexadas</span></div>
+      </div><div class="divider"></div><p class="small muted">Todo se procesa de forma anonimizada y agregada, conforme a la Ley 7.593/2025. No vendemos datos personales.</p></div>
+    </div>`;
+};
+
+/* =====================================================================
+   LEGAL
+   ===================================================================== */
+function legalHtml(){ return `
+  <div class="callout danger"><span class="ci">⚠️</span><div class="small">Texto de demostración. <b>No constituye asesoramiento legal.</b> Debe ser revisado y redactado por un abogado paraguayo antes de operar.</div></div>
+  <h4>1. Qué es Abogapy</h4><p>Abogapy es una <b>plataforma tecnológica de intermediación e información</b>. <b>No es un estudio jurídico</b>, no presta servicios legales ni representa a las partes. La relación profesional se da directamente entre cliente y abogado.</p>
+  <h4>2. Sin relación abogado-cliente con la plataforma</h4><p>Usar Abogapy no crea una relación abogado-cliente con Abogapy. Ningún contenido sustituye el asesoramiento de un profesional habilitado.</p>
+  <h4>3. Verificación de matrícula (referencial)</h4><p>Contrastamos datos contra el registro público de la Corte Suprema de Justicia. No garantizamos la vigencia, exactitud ni ausencia de sanciones de cada matrícula; verificá por tu cuenta cuando lo necesites.</p>
+  <h4>4. Tratamiento responsable de la información</h4><p>Operamos bajo <b>privacidad desde el diseño</b>. Usamos los datos estrictamente para prestar el servicio y, de forma <b>anonimizada y agregada</b>, para operar y mejorar la plataforma. <b>No vendemos datos personales.</b></p>
+  <h4>5. Protección de Datos (Ley N° 7.593/2025)</h4><p>Tratamos los datos con <b>consentimiento libre, previo, expreso e informado</b>. Podés ejercer tus derechos de <b>acceso, rectificación, supresión, oposición y portabilidad</b>. Los datos sensibles reciben protección reforzada.</p>
+  <h4>6. Grabación de reuniones y secreto profesional</h4><p>La grabación es <b>opcional</b> y exige el <b>consentimiento de ambas partes</b>. Grabar la palabra ajena sin consentimiento puede constituir un hecho punible (art. 144, Código Penal, Ley 1160/1997). El abogado es responsable del secreto profesional.</p>
+  <h4>7. Limitación de responsabilidad</h4><p>Abogapy <b>no garantiza resultados</b> ni la conducta de abogados o clientes. En la máxima medida permitida por la ley, no será responsable por daños derivados de la relación entre las partes ni por decisiones tomadas con base en la información de la plataforma.</p>
+  <h4>8. Obligaciones</h4><ol><li>El abogado declara que su matrícula está vigente y que no está inhabilitado.</li><li>El cliente provee información veraz y cuida sus accesos.</li><li>Honorarios y alcance se acuerdan directamente entre las partes.</li></ol>
+  <h4>9. Jurisdicción</h4><p>Se rige por las leyes de la República del Paraguay; competencia en los tribunales de Asunción.</p>
+  <p class="small muted">Última actualización (demo): ${fmt(now())}.</p>`; }
+function openLegal(){ document.getElementById('legalBody').innerHTML=legalHtml(); document.getElementById('legalOv').classList.add('on'); }
+function closeLegal(){ document.getElementById('legalOv').classList.remove('on'); }
+
+/* ---------- init ---------- */
+seed();
+if(location.hash.indexOf('adm')>=0){ showAdmPortal(); }
+document.getElementById('legalOv').addEventListener('click',e=>{ if(e.target.id==='legalOv')closeLegal(); });
+document.getElementById('modalOv').addEventListener('click',e=>{ if(e.target.id==='modalOv')closeModal(); });
+</script>
+</body>
+</html>
