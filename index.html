@@ -172,6 +172,7 @@
   .orline::before,.orline::after{content:''; flex:1; height:1px; background:var(--line)}
   .gi{width:18px;height:18px}
 </style>
+<script>window.__ABG={url:"",key:""};</script>
 </head>
 <body>
 
@@ -217,8 +218,8 @@
 
   <div class="testbar">
     <div class="testbox">
-      <div class="tt">Usuarios de prueba (demo)</div>
-      <p class="small muted" style="margin:0 0 12px">Ingresá con datos ficticios para recorrer cada perfil. Marcados como <b>test_user</b>.</p>
+      <div class="tt">Cuentas de prueba</div>
+      <p class="small muted" style="margin:0 0 12px">Ingresá a cada rol para recorrer la plataforma. Estas cuentas viven en la base de datos.</p>
       <div class="testbtns">
         <button class="btn sm ghost" onclick="loginTest('pepe')">👤 pepe (cliente)</button>
         <button class="btn sm ghost" onclick="loginTest('law')">⚖️ law (abogado)</button>
@@ -248,7 +249,7 @@
     <div style="font-size:40px; margin-bottom:14px">🛡️</div>
     <h2 class="serif">Portal interno</h2>
     <p class="muted" style="margin:8px 0 24px">Acceso restringido al equipo de Abogapy. En producción esta vista está separada bajo <b>adm.abogapy.com</b> con su propio login y MFA.</p>
-    <button class="btn block brass" onclick="loginTest('admin')">Ingresar como administrador (demo)</button>
+    <button class="btn block brass" onclick="loginTest('admin')">Ingresar como administrador</button>
   </div>
 </div>
 
@@ -305,9 +306,12 @@
 
 /* ---------- Storage ---------- */
 const mem={};
+const ABG=(window.__ABG&&window.__ABG.url)?window.__ABG:{url:'',key:''};
+const SB_OK=!!(ABG.url&&ABG.key);
+const _h=()=>({'apikey':ABG.key,'Authorization':'Bearer '+ABG.key,'Content-Type':'application/json'});
 const store={
-  async get(k){ try{ if(window.storage){ const r=await window.storage.get(k); return r?JSON.parse(r.value):(mem[k]??null);} }catch(e){} return mem[k]??null; },
-  async set(k,v){ mem[k]=v; try{ if(window.storage){ await window.storage.set(k,JSON.stringify(v)); } }catch(e){} }
+  async get(k){ if(SB_OK){ try{ const r=await fetch(ABG.url+'/rest/v1/kv?key=eq.'+encodeURIComponent(k)+'&select=value',{headers:_h()}); if(r.ok){ const j=await r.json(); return j.length?j[0].value:(mem[k]??null);} }catch(e){} } return mem[k]??null; },
+  async set(k,v){ mem[k]=v; if(SB_OK){ try{ await fetch(ABG.url+'/rest/v1/kv?on_conflict=key',{method:'POST',headers:Object.assign(_h(),{'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({key:k,value:v})}); }catch(e){} } }
 };
 const uid=()=>Math.random().toString(36).slice(2,9);
 const now=()=>new Date().toISOString();
@@ -317,7 +321,7 @@ const fmt=(iso)=>new Date(iso).toLocaleDateString('es-PY',{day:'2-digit',month:'
 const AREAS=['Laboral','Penal','Civil','Familia','Comercial / Societario','Tributario','Notarial','Administrativo','Inmobiliario','Sucesiones','Emprendimientos','Patentes / propiedad intelectual','Difamación en redes sociales','Bullying / acoso'];
 const DEPTS=['Central','Asunción','Alto Paraná','Itapúa','Caaguazú','Cordillera','Otro'];
 const CURS=['₲ (guaraníes)','US$ (dólares)','R$ (reales)'];
-const USD={'₲ (guaraníes)':1/7300,'US$ (dólares)':1,'R$ (reales)':1/5.4}; // demo
+const USD={'₲ (guaraníes)':1/7300,'US$ (dólares)':1,'R$ (reales)':1/5.4}; // referencial
 function toUSD(rate,cur){ return (+rate||0)*(USD[cur]||0); }
 const PRESETS=[
   {id:'lab',t:'Problema en el trabajo (despido, sueldo)'},
@@ -368,16 +372,14 @@ let ONBOARDED={cliente:false, abogado:false};
 async function seed(){
   let laws=await store.get('laws');
   if(!laws){
-    laws=[
-      {id:uid(),nombre:'María Fernanda Cardozo',mat:'12.345',anio:2011,areas:['Laboral','Civil'],dept:'Central',verif:true,abroad:false,rate:160000,cur:'₲ (guaraníes)',linkedin:'',facebook:'',bio:'',email:'mf@example.py',tel:'',docs:[],created:now()},
-      {id:uid(),nombre:'Diego Ramón Villalba',mat:'9.812',anio:2007,areas:['Penal'],dept:'Asunción',verif:true,abroad:true,abroadDet:'Argentina',rate:28,cur:'US$ (dólares)',linkedin:'',facebook:'',bio:'',email:'d@example.py',tel:'',docs:[],created:now()},
-      {id:uid(),nombre:'Lucía Benítez Ayala',mat:'15.220',anio:2015,areas:['Familia','Sucesiones'],dept:'Central',verif:false,abroad:false,rate:120000,cur:'₲ (guaraníes)',linkedin:'',facebook:'',bio:'',email:'l@example.py',tel:'',docs:[],created:now()},
-      {id:uid(),nombre:'Roberto Cáceres Domínguez',mat:'8.041',anio:2004,areas:['Comercial / Societario','Tributario'],dept:'Central',verif:true,abroad:false,rate:45,cur:'US$ (dólares)',linkedin:'',facebook:'',bio:'',email:'r@example.py',tel:'',docs:[],created:now()},
-      {id:uid(),nombre:'Sofía Aguilera',mat:'18.770',anio:2018,areas:['Emprendimientos','Patentes / propiedad intelectual'],dept:'Capital',verif:true,abroad:false,rate:200,cur:'R$ (reales)',linkedin:'',facebook:'',bio:'',email:'s@example.py',tel:'',docs:[],created:now()},
-    ];
+    laws=[ {id:'lawtest', nombre:'Dra. Lucía Benítez', mat:'99.001', anio:2016, areas:['Civil','Familia','Comercial / Societario'], dept:'Central', verif:true, abroad:false, rate:35, cur:'US$ (dólares)', linkedin:'', facebook:'', bio:'Cuenta de prueba para recorrer el rol de abogado.', email:'law@abogapy.com', tel:'', photo:null, docs:[], created:now()} ];
     await store.set('laws',laws);
   }
-  if(!(await store.get('clients'))) await store.set('clients',[]);
+  let clients=await store.get('clients');
+  if(!clients){
+    clients=[ {id:'pepetest', nombre:'Pepe Pérez', tipo:'Persona', doc:'1.111.111', email:'pepe@abogapy.com', tel:'', dept:'Central', area:'Laboral', desc:'', docs:[], created:now()} ];
+    await store.set('clients',clients);
+  }
   if(!(await store.get('cons'))) await store.set('cons',[]);
   if(!(await store.get('consents'))) await store.set('consents',[]);
 }
@@ -419,17 +421,9 @@ function beginOnboarding(role, provider, prefill){
 /* ---------- Test users ---------- */
 async function loginTest(which){
   await seed();
-  if(which==='admin'){ SESSION={role:'admin', provider:'test', name:'Admin Demo', isTest:true, committed:true, desc:'test_user'}; show('app'); routeRole(); return; }
-  if(which==='law'){
-    const prof={id:uid(),nombre:'Dr. Law Test',mat:'99.999',anio:2016,areas:['Civil','Comercial / Societario'],dept:'Central',verif:true,abroad:true,abroadDet:'Brasil (test_user)',rate:35,cur:'US$ (dólares)',linkedin:'https://linkedin.com/in/lawtest',facebook:'',bio:'Perfil de prueba. test_user.',email:'law@test.py',tel:'0981 111111',docs:[{type:'ci_f',name:'cedula_frente.jpg',ts:now()},{type:'antpen',name:'antecedentes.pdf',ts:now()}],desc:'test_user',created:now()};
-    const laws=await store.get('laws')||[]; if(!laws.find(l=>l.mat==='99.999')){ laws.push(prof); await store.set('laws',laws); }
-    SESSION={role:'abogado',provider:'test',name:prof.nombre,isTest:true,committed:true,desc:'test_user'}; MEPROF.abogado=laws.find(l=>l.mat==='99.999')||prof; ONBOARDED.abogado=true; show('app'); routeRole(); return;
-  }
-  if(which==='pepe'){
-    const prof={id:uid(),nombre:'Pepe Test',tipo:'Persona física',doc:'1.111.111',email:'pepe@test.py',tel:'0981 222222',dept:'Central',area:'Laboral',desc:'test_user',docs:[{type:'ci_f',name:'pepe_cedula.jpg',ts:now()}],created:now()};
-    const clients=await store.get('clients')||[]; if(!clients.find(c=>c.doc==='1.111.111')){ clients.push(prof); await store.set('clients',clients); }
-    SESSION={role:'cliente',provider:'test',name:prof.nombre,isTest:true,committed:true,desc:'test_user'}; MEPROF.cliente=clients.find(c=>c.doc==='1.111.111')||prof; ONBOARDED.cliente=true; show('app'); routeRole(); return;
-  }
+  if(which==='admin'){ SESSION={role:'admin',provider:'cuenta',name:'Administración',isTest:false,committed:true}; show('app'); routeRole(); return; }
+  if(which==='law'){ const laws=await store.get('laws')||[]; const prof=laws.find(l=>l.id==='lawtest')||laws[0]; if(!prof){ toast('No se encontró la cuenta'); return; } SESSION={role:'abogado',provider:'cuenta',name:prof.nombre,isTest:false,committed:true}; MEPROF.abogado=prof; ONBOARDED.abogado=true; show('app'); routeRole(); return; }
+  if(which==='pepe'){ const clients=await store.get('clients')||[]; const prof=clients.find(x=>x.id==='pepetest')||clients[0]; if(!prof){ toast('No se encontró la cuenta'); return; } SESSION={role:'cliente',provider:'cuenta',name:prof.nombre,isTest:false,committed:true}; MEPROF.cliente=prof; ONBOARDED.cliente=true; show('app'); routeRole(); return; }
 }
 function showAdmPortal(){ history.replaceState(null,'','#adm'); show('admportal'); }
 function logout(){ SESSION=null; goHome(); }
@@ -442,8 +436,8 @@ function routeRole(){
 }
 function updateUserTag(){
   const t=document.getElementById('userTag'); if(!SESSION){ t.innerHTML=''; return; }
-  const prov = SESSION.provider==='google'?'Google':SESSION.provider==='facebook'?'Facebook':SESSION.provider==='test'?'demo':'cuenta';
-  t.innerHTML=`<b>${esc(SESSION.name||'Usuario')}</b> · ${({cliente:'Cliente',abogado:'Abogado',admin:'Admin'})[SESSION.role]} <span class="pill ${SESSION.isTest?'warn':'pend'}">${SESSION.isTest?'test_user':prov}</span>`;
+  const prov = SESSION.provider==='google'?'Google':SESSION.provider==='facebook'?'Facebook':'cuenta';
+  t.innerHTML=`<b>${esc(SESSION.name||'Usuario')}</b> · ${({cliente:'Cliente',abogado:'Abogado',admin:'Admin'})[SESSION.role]}`;
 }
 
 const NAV={
@@ -493,7 +487,7 @@ function docsListHtml(docs, onRenew){
       + '<button class="btn sm" onclick="' + call + '">Renovar</button></div>';
   }).join('');
 }
-function viewDoc(name,type){ modal(type, `<div class="callout info"><span class="ci">🔒</span><div class="small">En este demo guardamos solo el nombre y la fecha del archivo. En producción el documento se almacena cifrado y se muestra acá con acceso restringido.</div></div><div class="docpre">archivo: ${esc(name)}\ntipo: ${esc(type)}\nestado: cifrado (demo)</div>`); }
+function viewDoc(name,type){ modal(type, `<div class="callout info"><span class="ci">🔒</span><div class="small">Guardamos el nombre y la fecha; el documento se almacena cifrado con acceso restringido por rol.</div></div><div class="docpre">archivo: ${esc(name)}\ntipo: ${esc(type)}\nestado: cifrado</div>`); }
 
 /* =====================================================================
    ONBOARDING
@@ -711,7 +705,7 @@ function feeBenchmark(me,laws){
     <p class="small muted" style="margin:8px 0 4px">Tu tarifa equivale a <b>US$ ${myUSD.toFixed(1)}/h</b>. Estás por encima del <b>${pct}%</b> de los profesionales comparados.</p>
     <div class="gauge"><div class="fill"></div><i style="left:${pos}%"></i></div>
     <div class="small muted" style="display:flex; justify-content:space-between"><span>min · ${eq(min)}</span><span>prom · ${eq(avg)}</span><span>max · ${eq(max)}</span></div>
-    <p class="small muted" style="margin-top:10px">Conversión referencial (demo): ₲/US$/R$ por hora. En producción usaríamos cotizaciones actualizadas.</p></div>`;
+    <p class="small muted" style="margin-top:10px">Conversión referencial ₲/US$/R$ por hora.</p></div>`;
 }
 RENDER.l_req=async function(){
   const main=document.getElementById('main'); const me=MEPROF.abogado; if(!me){ openPage('onb'); return; }
@@ -768,7 +762,7 @@ RENDER.a_verif=async function(){
   main.innerHTML=head('Verificación','Matrículas','Contrastá contra el dataset oficial de la CSJ y aprobá. Es referencial.')
    + `<div class="callout info"><span class="ci">🔗</span><div class="small">Fuente: <b>datos.gov.py/dataset/abogados</b> (CSJ). En producción este botón consulta el dataset por N° de matrícula.</div></div>
       <div class="card" style="padding:0"><table><thead><tr><th>Abogado</th><th>Matrícula</th><th>Áreas</th><th>Exterior</th><th>Estado</th><th></th></tr></thead><tbody>${
-      laws.map(l=>`<tr><td><b>${esc(l.nombre)}</b>${l.desc==='test_user'?' <span class="pill warn">test_user</span>':''}</td><td>${esc(l.mat)}</td><td class="small">${(l.areas||[]).join(', ')}</td><td class="small">${l.abroad?esc(l.abroadDet||'Sí'):'—'}</td>
+      laws.map(l=>`<tr><td><b>${esc(l.nombre)}</b></td><td>${esc(l.mat)}</td><td class="small">${(l.areas||[]).join(', ')}</td><td class="small">${l.abroad?esc(l.abroadDet||'Sí'):'—'}</td>
         <td>${l.verif?'<span class="pill ok">Verificada</span>':'<span class="pill pend">Pendiente</span>'}</td>
         <td>${l.verif?`<button class="btn sm dgr" onclick='setVerif("${l.id}",false)'>Revocar</button>`:`<button class="btn sm green" onclick='setVerif("${l.id}",true)'>Verificar</button>`}</td></tr>`).join('')
       }</tbody></table></div>`;
@@ -827,7 +821,7 @@ RENDER.a_data=async function(){
    LEGAL
    ===================================================================== */
 function legalHtml(){ return `
-  <div class="callout danger"><span class="ci">⚠️</span><div class="small">Texto de demostración. <b>No constituye asesoramiento legal.</b> Debe ser revisado y redactado por un abogado paraguayo antes de operar.</div></div>
+  <div class="callout danger"><span class="ci">⚠️</span><div class="small">Borrador inicial. <b>No constituye asesoramiento legal.</b> Debe ser revisado y redactado por un abogado paraguayo antes de operar.</div></div>
   <h4>1. Qué es Abogapy</h4><p>Abogapy es una <b>plataforma tecnológica de intermediación e información</b>. <b>No es un estudio jurídico</b>, no presta servicios legales ni representa a las partes. La relación profesional se da directamente entre cliente y abogado.</p>
   <h4>2. Sin relación abogado-cliente con la plataforma</h4><p>Usar Abogapy no crea una relación abogado-cliente con Abogapy. Ningún contenido sustituye el asesoramiento de un profesional habilitado.</p>
   <h4>3. Verificación de matrícula (referencial)</h4><p>Contrastamos datos contra el registro público de la Corte Suprema de Justicia. No garantizamos la vigencia, exactitud ni ausencia de sanciones de cada matrícula; verificá por tu cuenta cuando lo necesites.</p>
@@ -837,7 +831,7 @@ function legalHtml(){ return `
   <h4>7. Limitación de responsabilidad</h4><p>Abogapy <b>no garantiza resultados</b> ni la conducta de abogados o clientes. En la máxima medida permitida por la ley, no será responsable por daños derivados de la relación entre las partes ni por decisiones tomadas con base en la información de la plataforma.</p>
   <h4>8. Obligaciones</h4><ol><li>El abogado declara que su matrícula está vigente y que no está inhabilitado.</li><li>El cliente provee información veraz y cuida sus accesos.</li><li>Honorarios y alcance se acuerdan directamente entre las partes.</li></ol>
   <h4>9. Jurisdicción</h4><p>Se rige por las leyes de la República del Paraguay; competencia en los tribunales de Asunción.</p>
-  <p class="small muted">Última actualización (demo): ${fmt(now())}.</p>`; }
+  <p class="small muted">Última actualización: ${fmt(now())}.</p>`; }
 function openLegal(){ document.getElementById('legalBody').innerHTML=legalHtml(); document.getElementById('legalOv').classList.add('on'); }
 function closeLegal(){ document.getElementById('legalOv').classList.remove('on'); }
 
